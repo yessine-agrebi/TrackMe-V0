@@ -1,6 +1,7 @@
-import { addDevice, getAllDevices } from "../services/devices.service.js";
+import { addDevice, getAllDevices, getDeviceById } from "../services/devices.service.js";
 
 export const devicesController = {
     getAllDevices: getAllDevices,
-    addDevice: addDevice
+    addDevice: addDevice,
+    getDeviceById: getDeviceById
 }
