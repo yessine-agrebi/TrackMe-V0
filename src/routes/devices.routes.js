@@ -13,5 +13,7 @@ router.get(
 );
 router.post("/", authController.protect, devicesController.addDevice);
 router.delete("/:id", authController.protect, devicesController.deleteDevice);
+router.patch("/:id", authController.protect, devicesController.updateDevice);
+
 
 export default router;

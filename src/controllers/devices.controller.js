@@ -4,6 +4,7 @@ import {
   getAllDevices,
   getDeviceById,
   getDevicePosition,
+  updateDevice,
 } from "../services/devices.service.js";
 
 export const devicesController = {
@@ -12,4 +13,5 @@ export const devicesController = {
   getDeviceById: getDeviceById,
   getDevicePosition: getDevicePosition,
   deleteDevice: deleteDevice,
+  updateDevice: updateDevice
 };

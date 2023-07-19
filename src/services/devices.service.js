@@ -74,6 +74,22 @@ const deleteDevice = AsyncHandler(async (req, res, next) => {
     console.error("Error while deleting device:", error);
   }
 });
+const updateDevice = AsyncHandler(async (req, res) => {
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: `FlespiToken ${process.env.FLESPITOKEN}`,
+    };
+    try {
+      const response = await axios.patch(
+        `${process.env.ENDPOINT}/gw/devices/${req.params.id}`, req.body,
+        { headers }
+      );
+      const device = response.data.result;
+      res.json(device);
+    } catch (error) {
+      console.error("Error while editing device:", error);
+    }
+  });
 const getDevicePosition = AsyncHandler(async (req, res) => {
   const headers = {
     "Content-Type": "application/json",
@@ -97,4 +113,5 @@ export {
   getDeviceById,
   getDevicePosition,
   deleteDevice,
+  updateDevice
 };
