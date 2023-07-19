@@ -48,6 +48,20 @@ const addDevice = AsyncHandler(async (req, res) => {
       res.status(400).json(error)
     }
   });
-  
 
-export {getAllDevices, addDevice, getDeviceById}
+  const getDevicePosition = AsyncHandler(async(req, res) => {
+    const headers = {
+        "Content-Type": "application/json",
+        Authorization: `FlespiToken ${process.env.FLESPITOKEN}`,
+      };
+      try {
+        const response = await axios.get(`${process.env.ENDPOINT}/gw/devices/${req.params.id}/telemetry/position`, { headers });
+        const device = response.data.result;
+        res.json(device);
+      } catch (error) {
+        console.error("Error while fetching devices:", error);
+      }
+    
+})
+
+export {getAllDevices, addDevice, getDeviceById, getDevicePosition}

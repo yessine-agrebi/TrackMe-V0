@@ -8,6 +8,7 @@ const router = express.Router();
 
 router.get('/',authController.protect , devicesController.getAllDevices)
 router.get('/:id', devicesController.getDeviceById)
+router.get('/:id/position', devicesController.getDevicePosition)
 router.post('/', devicesController.addDevice)
 
 
