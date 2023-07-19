@@ -3,7 +3,7 @@ import validatorMiddleware from "../middlewares/validatorMiddleware.js";
 import User from "../model/usersModel.js";
 
 // eslint-disable-next-line import/prefer-default-export
-export const signupValidator = [
+export const createUserValidator = [
   body("name")
     .notEmpty()
     .withMessage("le nom est obligatoire")
