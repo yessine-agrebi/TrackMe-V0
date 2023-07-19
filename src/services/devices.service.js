@@ -3,7 +3,6 @@ import AsyncHandler from "express-async-handler";
 import _ from "lodash";
 import ApiError from "../utils/apiError.js";
 const getAllDevices = AsyncHandler(async (req, res) => {
-  console.log(req.user);
   const headers = {
     "Content-Type": "application/json",
     Authorization: `FlespiToken ${process.env.FLESPITOKEN}`,
