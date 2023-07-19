@@ -2,6 +2,7 @@ import axios from "axios";
 import AsyncHandler from "express-async-handler";
 import _ from "lodash";
 import ApiError from "../utils/apiError.js";
+import User from "../model/usersModel.js";
 const getAllDevices = AsyncHandler(async (req, res) => {
   const headers = {
     "Content-Type": "application/json",
@@ -36,14 +37,15 @@ const getDeviceById = AsyncHandler(async (req, res) => {
   }
 });
 
-const addDevice = AsyncHandler(async (req, res) => {
+const addDevice = AsyncHandler(async (req, res, next) => {
+  const {user} = req.body[0]
+  delete req.body[0].user
   try {
     const headers = {
       "Content-Type": "application/json",
       Authorization: `FlespiToken ${process.env.FLESPITOKEN}`,
     };
     const clonedData = _.cloneDeep(req.body);
-    console.log(clonedData);
     const response = await axios.post(
       `${process.env.ENDPOINT}/gw/devices`,
       clonedData,
@@ -51,6 +53,12 @@ const addDevice = AsyncHandler(async (req, res) => {
         headers,
       }
     );
+    const searchedUser = User.findById(user);
+    if(!searchedUser) {
+      return next(new ApiError('pas d\'utilisateur avec cet id', 404))
+    }
+    searchedUser.devices.push()
+    
     res.status(201).json(response.data.result);
   } catch (error) {
     res.status(400).json(error);

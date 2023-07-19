@@ -21,7 +21,8 @@ const deviceSchema = new mongoose.Schema({
   },
   id: {
     type: Number,
-    required: false
+    required: true,
+    unique: true
   },
   configuration: {
     type: configurationSchema, required: true
