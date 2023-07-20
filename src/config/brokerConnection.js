@@ -45,4 +45,11 @@ export function initializeMqtt() {
   client.on('close', () => {
     console.log('Connection closed');
   });
+  client.on('offline', () => {
+    console.log('Connection offline'); // Add more handling for offline status
+  });
+
+  client.on('reconnect', () => {
+    console.log('Reconnecting to MQTT broker'); // Add more handling for reconnecting status
+  });
 }

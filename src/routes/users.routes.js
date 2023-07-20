@@ -5,7 +5,7 @@ import { createUserValidator } from '../utils/authValidator.js';
 const router = express.Router();
 
 
-router.get('/', authController.protect, usersController.getAllUsers);
+router.get('/', usersController.getAllUsers);
 router.get('/:id', authController.protect, usersController.getOneUser);
 router.post('/', authController.protect, createUserValidator, usersController.createUser );
 router.put('/:id', authController.protect, usersController.updateUser);

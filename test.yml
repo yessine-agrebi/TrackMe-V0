@@ -1,0 +1,11 @@
+config:
+  target: "http://localhost:3001"
+  phases:
+    - duration: 60
+      arrivalRate: 100
+
+scenarios:
+  - name: "Load Test API Endpoint"
+    flow:
+      - get:
+          url: "/api/v0/users"
