@@ -3,6 +3,7 @@ import AsyncHandler from "express-async-handler";
 import _ from "lodash";
 import ApiError from "../utils/apiError.js";
 import User from "../model/usersModel.js";
+import Device from "../model/deviceModel.js";
 const getAllDevices = AsyncHandler(async (req, res) => {
   const headers = {
     "Content-Type": "application/json",
@@ -53,13 +54,19 @@ const addDevice = AsyncHandler(async (req, res, next) => {
         headers,
       }
     );
-    const searchedUser = User.findById(user);
+    console.log("user", user)
+    const searchedUser = await User.findById(user);
+    console.log(searchedUser)
     if(!searchedUser) {
       return next(new ApiError('pas d\'utilisateur avec cet id', 404))
     }
-    searchedUser.devices.push()
-    
-    res.status(201).json(response.data.result);
+    const deviceData = {...response.data.result[0], user: user}
+    const device = new Device(deviceData)
+    const newDevice = await device.save()
+    console.log(newDevice)
+    searchedUser.devices.push(newDevice.id)
+    await searchedUser.save()
+    res.status(201).json(newDevice);
   } catch (error) {
     res.status(400).json(error);
   }

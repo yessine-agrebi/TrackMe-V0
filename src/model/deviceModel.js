@@ -34,6 +34,9 @@ const deviceSchema = new mongoose.Schema({
   },
   cid:{
     type: Number
+  },
+  user:{
+    type: mongoose.Schema.Types.ObjectId, ref: "User"
   }
 });
 

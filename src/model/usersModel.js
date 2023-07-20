@@ -21,7 +21,7 @@ const userSchema = new mongoose.Schema({
     default: "client",
   },
   parentid: {type: mongoose.Schema.Types.ObjectId, ref: "User",default: null, required: false},
-  devices:[ {type: mongoose.Schema.Types.ObjectId, ref: "Device", required: false}],
+  devices:[ {type: Number, ref: "Device", required: false}],
   users: [{type: mongoose.Schema.Types.ObjectId, ref: "User",default: null, required: false}],
   phone: {
     type: String,
