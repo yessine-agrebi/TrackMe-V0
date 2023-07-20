@@ -18,7 +18,7 @@ app.use(cookieParser());
 
 // Connect to MongoDB
 dbConnection();
-//initializeMqtt();
+initializeMqtt();
 //Routes
 app.use('/api/v0/auth', authRouter)
 app.use('/api/v0/users', usersRouter)
