@@ -13,8 +13,8 @@ const carSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-  device_id: { type: String, required: false },
+  user: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
+  device_id: { type: Number, ref: "Device", default: null },
 });
 
 const Car = mongoose.model("Car", carSchema);

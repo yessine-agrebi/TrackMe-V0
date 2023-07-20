@@ -1,5 +1,6 @@
-import { getHistory } from "../services/history.service.js";
+import { getHistory, getLocationsByDate } from "../services/history.service.js";
 
 export const historyController = {
-    getHistory: getHistory
+    getHistory: getHistory,
+    getLocationsBydate: getLocationsByDate
 }

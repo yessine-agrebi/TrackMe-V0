@@ -4,6 +4,7 @@ const router = express.Router();
 
 
 router.get('/:id', historyController.getHistory)
+router.get('/:deviceId/:start/:end?', historyController.getLocationsBydate)
 
 
 
