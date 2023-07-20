@@ -39,8 +39,8 @@ const getDeviceById = AsyncHandler(async (req, res) => {
 });
 
 const addDevice = AsyncHandler(async (req, res, next) => {
-  const {user} = req.body[0]
-  delete req.body[0].user
+  const { user } = req.body[0];
+  delete req.body[0].user;
   try {
     const headers = {
       "Content-Type": "application/json",
@@ -54,18 +54,18 @@ const addDevice = AsyncHandler(async (req, res, next) => {
         headers,
       }
     );
-    console.log("user", user)
+    console.log("user", user);
     const searchedUser = await User.findById(user);
-    console.log(searchedUser)
-    if(!searchedUser) {
-      return next(new ApiError('pas d\'utilisateur avec cet id', 404))
+    console.log(searchedUser);
+    if (!searchedUser) {
+      return next(new ApiError("pas d'utilisateur avec cet id", 404));
     }
-    const deviceData = {...response.data.result[0], user: user}
-    const device = new Device(deviceData)
-    const newDevice = await device.save()
-    console.log(newDevice)
-    searchedUser.devices.push(newDevice.id)
-    await searchedUser.save()
+    const deviceData = { ...response.data.result[0], user: user };
+    const device = new Device(deviceData);
+    const newDevice = await device.save();
+    console.log(newDevice);
+    searchedUser.devices.push(newDevice.id);
+    await searchedUser.save();
     res.status(201).json(newDevice);
   } catch (error) {
     res.status(400).json(error);
@@ -76,35 +76,49 @@ const deleteDevice = AsyncHandler(async (req, res, next) => {
     "Content-Type": "application/json",
     Authorization: `FlespiToken ${process.env.FLESPITOKEN}`,
   };
+  const deviceId = req.params.id;
   try {
     const response = await axios.delete(
-      `${process.env.ENDPOINT}/gw/devices/${req.params.id}`,
+      `${process.env.ENDPOINT}/gw/devices/${deviceId}`,
       { headers }
     );
     if (!response) {
       return next(new ApiError("Pas d'appareil avec cet id", 404));
     }
+    const device = await Device.findOneAndDelete({ id: deviceId });
+    if (!device) {
+      return next(new ApiError("Device not found", 404));
+    }
+    const userId = device.user;
+    const user = await User.findById(userId);
+    if (!user) {
+      return next(new ApiError("User not found", 404));
+    }
+
+    user.devices.pull(deviceId);
+    await user.save();
     res.json("Appareil Supprimé");
   } catch (error) {
     console.error("Error while deleting device:", error);
   }
 });
 const updateDevice = AsyncHandler(async (req, res) => {
-    const headers = {
-      "Content-Type": "application/json",
-      Authorization: `FlespiToken ${process.env.FLESPITOKEN}`,
-    };
-    try {
-      const response = await axios.patch(
-        `${process.env.ENDPOINT}/gw/devices/${req.params.id}`, req.body,
-        { headers }
-      );
-      const device = response.data.result;
-      res.json(device);
-    } catch (error) {
-      console.error("Error while editing device:", error);
-    }
-  });
+  const headers = {
+    "Content-Type": "application/json",
+    Authorization: `FlespiToken ${process.env.FLESPITOKEN}`,
+  };
+  try {
+    const response = await axios.patch(
+      `${process.env.ENDPOINT}/gw/devices/${req.params.id}`,
+      req.body,
+      { headers }
+    );
+    const device = response.data.result;
+    res.json(device);
+  } catch (error) {
+    console.error("Error while editing device:", error);
+  }
+});
 const getDevicePosition = AsyncHandler(async (req, res) => {
   const headers = {
     "Content-Type": "application/json",
@@ -128,5 +142,5 @@ export {
   getDeviceById,
   getDevicePosition,
   deleteDevice,
-  updateDevice
+  updateDevice,
 };
