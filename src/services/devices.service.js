@@ -130,7 +130,8 @@ const getDevicePosition = AsyncHandler(async (req, res) => {
       { headers }
     );
     const device = response.data.result;
-    res.json(device);
+    const filteredData = device.map(({ telemetry: { position: { value } } }) => value);
+    res.json(filteredData);
   } catch (error) {
     console.error("Error while fetching devices:", error);
   }

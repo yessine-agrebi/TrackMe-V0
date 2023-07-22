@@ -4,16 +4,11 @@ import { authController } from "../controllers/auth.controller.js";
 
 const router = express.Router();
 
-router.get("/", authController.protect, devicesController.getAllDevices);
-router.get("/:id", authController.protect, devicesController.getDeviceById);
-router.get(
-  "/:id/position",
-  authController.protect,
-  devicesController.getDevicePosition
-);
-router.post("/", authController.protect, devicesController.addDevice);
-router.delete("/:id", authController.protect, devicesController.deleteDevice);
-router.patch("/:id", authController.protect, devicesController.updateDevice);
-
+router.get("/", devicesController.getAllDevices);
+router.get("/:id", devicesController.getDeviceById);
+router.get("/:id/position", devicesController.getDevicePosition);
+router.post("/", devicesController.addDevice);
+router.delete("/:id", devicesController.deleteDevice);
+router.patch("/:id", devicesController.updateDevice);
 
 export default router;
