@@ -10,7 +10,10 @@ import usersRouter from "./routes/users.routes.js";
 import devicesRouter from "./routes/devices.routes.js";
 import historyRouter from "./routes/history.routes.js";
 import carsRouter from "./routes/cars.routes.js";
-import { setSocket } from "./services/devices.service.js";
+import {
+  fetchRealTimePosition,
+  setSocket,
+} from "./services/devices.service.js";
 import { Server } from "socket.io";
 import { createServer } from "http";
 dotenv.config();
@@ -36,12 +39,34 @@ const io = new Server(server, {
   },
 });
 
+io.on("connection", (socket) => {
+  console.log("A new client connected");
+
+  // Listen for the 'getInitialPosition' event from the client
+  socket.on("getInitialPosition", (data) => {
+    // Fetch the initial position data for the specified device
+    // For example, you can use the data.deviceId to fetch the position data from your database
+    fetchRealTimePosition(data)
+      .then((position) => {
+        socket.emit("positionUpdate", position);
+      })
+      .catch((error) => {
+        console.error("Error fetching position:", error);
+      });
+  });
+
+  // Cleanup: Disconnect the socket when the client disconnects
+  socket.on("disconnect", () => {
+    console.log("Client disconnected");
+  });
+});
+
 // This function will be used to emit events from your service functions
 export const emitEvent = (eventName, data) => {
   io.emit(eventName, data);
 };
 
-setSocket(io)
+setSocket(io);
 
 //Routes
 app.use("/api/v0/auth", authRouter);
@@ -54,4 +79,3 @@ server.listen(process.env.APP_PORT, () => {
   console.log(`Server running on port ${process.env.APP_PORT}`);
   console.log(`worker pid = ${process.pid}`);
 });
-

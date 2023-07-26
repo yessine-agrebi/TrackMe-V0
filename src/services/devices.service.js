@@ -130,7 +130,7 @@ const updateDevice = AsyncHandler(async (req, res) => {
     console.error("Error while editing device:", error);
   }
 });
-async function fetchRealTimePosition(deviceId) {
+export async function fetchRealTimePosition(deviceId) {
   const headers = {
     "Content-Type": "application/json",
     Authorization: `FlespiToken ${process.env.FLESPITOKEN}`,
