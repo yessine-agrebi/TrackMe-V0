@@ -130,23 +130,51 @@ const updateDevice = AsyncHandler(async (req, res) => {
     console.error("Error while editing device:", error);
   }
 });
-const getDevicePosition = AsyncHandler(async (req, res) => {
+async function fetchRealTimePosition(deviceId) {
   const headers = {
     "Content-Type": "application/json",
     Authorization: `FlespiToken ${process.env.FLESPITOKEN}`,
   };
   try {
     const response = await axios.get(
-      `${process.env.ENDPOINT}/gw/devices/${req.params.id}/telemetry/position`,
+      `${process.env.ENDPOINT}/gw/devices/${deviceId}/telemetry/position`,
       { headers }
     );
     const device = response.data.result;
     const filteredData = device.map(({ telemetry: { position: { value } } }) => value);
-    emitEvent('positionUpdate', { latitude: filteredData[0].latitude, longitude: filteredData[0].longitude });
-    res.json(filteredData);
+    if (filteredData.length > 0) {
+      return { latitude: filteredData[0].latitude, longitude: filteredData[0].longitude };
+    }
   } catch (error) {
-    console.error("Error while fetching devices:", error);
+    console.error("Error while fetching real-time position:", error);
   }
+}
+const getDevicePosition = (io) => AsyncHandler(async (req, res) => {
+  const deviceId = req.params.id;
+
+  // Function to emit real-time position updates
+  const emitRealTimePosition = async () => {
+    const devicePosition = await fetchRealTimePosition(deviceId);
+    if (devicePosition) {
+      io.emit("positionUpdate", devicePosition);
+    }
+  };
+
+  // Call emitRealTimePosition immediately to fetch the initial position
+  emitRealTimePosition();
+
+  // Set up an interval to emit real-time position updates every 5 seconds
+  const interval = setInterval(emitRealTimePosition, 5000);
+
+  // When the client disconnects, clear the interval
+  io.on("disconnect", () => {
+    clearInterval(interval);
+    console.log("Client disconnected, real-time updates stopped");
+  });
+
+  // You can also return the initial position data if needed
+  // For example:
+  res.json({ message: "Initial position fetched", deviceId });
 });
 
 const getDeviceStatus = AsyncHandler(async (req, res) => {
