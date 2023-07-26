@@ -10,6 +10,7 @@ import usersRouter from "./routes/users.routes.js";
 import devicesRouter from "./routes/devices.routes.js";
 import historyRouter from "./routes/history.routes.js";
 import carsRouter from "./routes/cars.routes.js";
+import { setSocket } from "./services/devices.service.js";
 import { Server } from "socket.io";
 import { createServer } from "http";
 dotenv.config();
@@ -26,21 +27,21 @@ dbConnection();
 const server = createServer(app);
 
 // Initialize Socket.io server
-const io = new Server(server);
-// Inside the io.on('connection', ...) block
-io.on("connection", (socket) => {
-  console.log("A client connected");
-
-  // Example: Send a message to the client
-  socket.emit("message", "Hello from server");
-
-  // Example: Receive a message from the client
-  socket.on("clientMessage", (data) => {
-    console.log("Received message from client:", data);
-  });
-
-  // Handle other events as needed
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"],
+    allowedHeaders: ["Authorization", "Content-Type"],
+    credentials: true,
+  },
 });
+
+// This function will be used to emit events from your service functions
+export const emitEvent = (eventName, data) => {
+  io.emit(eventName, data);
+};
+
+setSocket(io)
 
 //Routes
 app.use("/api/v0/auth", authRouter);

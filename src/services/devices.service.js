@@ -4,6 +4,18 @@ import _ from "lodash";
 import ApiError from "../utils/apiError.js";
 import User from "../model/usersModel.js";
 import Device from "../model/deviceModel.js";
+import { emitEvent } from "../index.js";
+
+// users.service.js
+
+let socket;
+
+function setSocket(io) {
+  socket = io;
+}
+
+
+
 const getAllDevices = AsyncHandler(async (req, res) => {
   const headers = {
     "Content-Type": "application/json",
@@ -54,7 +66,6 @@ const addDevice = AsyncHandler(async (req, res, next) => {
         headers,
       }
     );
-    console.log("user", user);
     const searchedUser = await User.findById(user);
     console.log(searchedUser);
     if (!searchedUser) {
@@ -131,6 +142,7 @@ const getDevicePosition = AsyncHandler(async (req, res) => {
     );
     const device = response.data.result;
     const filteredData = device.map(({ telemetry: { position: { value } } }) => value);
+    emitEvent('positionUpdate', { latitude: filteredData[0].latitude, longitude: filteredData[0].longitude });
     res.json(filteredData);
   } catch (error) {
     console.error("Error while fetching devices:", error);
@@ -161,5 +173,6 @@ export {
   getDevicePosition,
   deleteDevice,
   updateDevice,
-  getDeviceStatus
+  getDeviceStatus,
+  setSocket
 };
