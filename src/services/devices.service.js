@@ -144,7 +144,7 @@ const getDeviceStatus = AsyncHandler(async (req, res) => {
   };
   try {
     const response = await axios.get(
-      `${process.env.ENDPOINT}/gw/devices/${req.params.id}/telemetry/battery.level,device.name,gsm.signal.level,gnss.realtime.status`,
+      `${process.env.ENDPOINT}/gw/devices/${req.params.id}/telemetry/battery.level,device.name,gsm.signal.level,gnss.realtime.status,defense.active.status`,
       { headers }
     );
     const device = response.data.result;
