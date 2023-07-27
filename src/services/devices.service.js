@@ -164,7 +164,7 @@ const getDevicePosition = (io) => AsyncHandler(async (req, res) => {
   emitRealTimePosition();
 
   // Set up an interval to emit real-time position updates every 5 seconds
-  const interval = setInterval(emitRealTimePosition, 5000);
+  const interval = setInterval(emitRealTimePosition, 10000);
 
   // When the client disconnects, clear the interval
   io.on("disconnect", () => {

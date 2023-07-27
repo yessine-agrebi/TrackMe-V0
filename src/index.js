@@ -41,22 +41,34 @@ const io = new Server(server, {
 
 io.on("connection", (socket) => {
   console.log("A new client connected");
-
+  let interval;
   // Listen for the 'getInitialPosition' event from the client
   socket.on("getInitialPosition", (data) => {
     // Fetch the initial position data for the specified device
     // For example, you can use the data.deviceId to fetch the position data from your database
-    fetchRealTimePosition(data)
-      .then((position) => {
-        socket.emit("positionUpdate", position);
-      })
-      .catch((error) => {
-        console.error("Error fetching position:", error);
-      });
+    const emitRealTimePosition = () => {
+      // Fetch the real-time position data using fetchRealTimePosition
+      fetchRealTimePosition(data)
+        .then((position) => {
+          // Emit the 'positionUpdate' event with the position data
+          socket.emit("positionUpdate", position);
+          console.log(position);
+        })
+        .catch((error) => {
+          console.error("Error fetching position:", error);
+        });
+    };
+
+    // Call emitRealTimePosition immediately
+    emitRealTimePosition();
+
+    // Set up an interval to call emitRealTimePosition every 5 seconds
+    interval = setInterval(emitRealTimePosition, 5000);
   });
 
   // Cleanup: Disconnect the socket when the client disconnects
   socket.on("disconnect", () => {
+    clearInterval(interval);
     console.log("Client disconnected");
   });
 });
