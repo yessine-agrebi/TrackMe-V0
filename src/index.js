@@ -63,7 +63,7 @@ io.on("connection", (socket) => {
     emitRealTimePosition();
 
     // Set up an interval to call emitRealTimePosition every 5 seconds
-    interval = setInterval(emitRealTimePosition, 5000);
+    interval = setInterval(emitRealTimePosition, 10000);
   });
 
   // Cleanup: Disconnect the socket when the client disconnects
