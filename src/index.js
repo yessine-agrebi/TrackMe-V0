@@ -62,7 +62,6 @@ io.on("connection", (socket) => {
   });
 });
 
-// This function will be used to emit events from your service functions
 export const emitEvent = (eventName, data) => {
   io.emit(eventName, data);
 };
