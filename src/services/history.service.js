@@ -30,12 +30,14 @@ const getHistory = asyncHandler(async (req, res, next) => {
       }
     );
     const historyData = response.data.result;
-    const history = new History({
-      device: {
-        id: historyData[0]["device.id"],
-        name: historyData[0]["device.name"],
-      },
-      positions: historyData.map((position) => {
+    const deviceId = historyData[0]["device.id"];
+
+    // Find the existing document with the same device ID
+    const existingHistory = await History.findOne({ "device.id": deviceId });
+
+    if (existingHistory) {
+      // If the document exists, update its positions
+      existingHistory.positions = historyData.map((position) => {
         const timestamp = position["position.timestamp"];
         const date = new Date(timestamp * 1000);
         const formattedDate = format(date, 'dd/MM/yyyy');
@@ -44,18 +46,44 @@ const getHistory = asyncHandler(async (req, res, next) => {
           latitude: position["position.latitude"],
           longitude: position["position.longitude"],
           speed: position["position.speed"],
-          date: formattedDate, // Get the formatted date
+          date: formattedDate,
           time: formattedTime
         };
-      }),
-    });
-    await history.save();
-  
-    res.status(201).json(history);
+      });
+
+      await existingHistory.save();
+      res.status(200).json(existingHistory);
+    } else {
+      // If the document doesn't exist, create a new one
+      const history = new History({
+        device: {
+          id: deviceId,
+          name: historyData[0]["device.name"],
+        },
+        positions: historyData.map((position) => {
+          const timestamp = position["position.timestamp"];
+          const date = new Date(timestamp * 1000);
+          const formattedDate = format(date, 'dd/MM/yyyy');
+          const formattedTime = format(date, 'HH:mm:ss');
+          return {
+            latitude: position["position.latitude"],
+            longitude: position["position.longitude"],
+            speed: position["position.speed"],
+            date: formattedDate,
+            time: formattedTime
+          };
+        }),
+      });
+
+      await history.save();
+      res.status(201).json(history);
+    }
   } catch (error) {
     console.error("Error updating location:", error);
+    res.status(500).json({ message: "Server error" });
   }
 });
+
 
 const getLocationsByDate = async (req, res) => {
   const { deviceId, start, end } = req.params;
