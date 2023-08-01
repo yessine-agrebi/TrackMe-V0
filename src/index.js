@@ -78,7 +78,9 @@ export const emitEvent = (eventName, data) => {
 };
 
 setSocket(io);
-
+app.get('/', (req, res) => {
+  res.send('Welcome to track me api service')
+})
 //Routes
 app.use("/api/v0/auth", authRouter);
 app.use("/api/v0/users", usersRouter);
