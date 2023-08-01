@@ -20,7 +20,14 @@ dotenv.config();
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST", "PATCH", "DELETE"],
+    allowedHeaders: ["Authorization", "Content-Type"],
+    credentials: true,
+  })
+);
 app.use(cookieParser());
 
 // Connect to MongoDB
@@ -33,7 +40,7 @@ const server = createServer(app);
 const io = new Server(server, {
   cors: {
     origin: "http://localhost:5173",
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "PATCH", "DELETE"],
     allowedHeaders: ["Authorization", "Content-Type"],
     credentials: true,
   },

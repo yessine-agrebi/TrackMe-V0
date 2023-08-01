@@ -33,16 +33,13 @@ const login = asyncHandler(async (req, res, next) => {
 });
 
 const logout = asyncHandler(async (req, res, next) => {
-  const { cookies } = req;
-  if (!cookies.refreshToken) {
-    return next(new ApiError("vous n'êtes pas connecté", 401));
-  }
-  res.clearCookie("refreshToken", { httpOnly: true });
+  // No need to check cookies since you are handling authentication client-side
   res.status(200).json({
     status: "success",
     message: "vous êtes déconnecté",
   });
 });
+
 
 const protect = asyncHandler(async (req, res, next) => {
   // console.log(req.headers);
