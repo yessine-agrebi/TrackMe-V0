@@ -26,7 +26,7 @@ const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "https://trackme-front.onrender.com"],
     methods: ["GET", "POST", "PATCH", "DELETE"],
     allowedHeaders: ["Authorization", "Content-Type"],
     credentials: true,
@@ -43,7 +43,7 @@ const server = createServer(app);
 // Initialize Socket.io server
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "https://trackme-front.onrender.com"],
     methods: ["GET", "POST", "PATCH", "DELETE"],
     allowedHeaders: ["Authorization", "Content-Type"],
     credentials: true,
