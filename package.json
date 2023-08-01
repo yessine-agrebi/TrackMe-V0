@@ -5,7 +5,8 @@
   "main": "./src/index.js",
   "type": "module",
   "scripts": {
-    "start": "nodemon ./src/index.js",
+    "start:dev": "nodemon ./src/index.js",
+    "start:prod": "cross-env NODE_ENV=production node ./src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -27,5 +28,8 @@
     "mongoose": "^7.4.0",
     "mqtt": "^4.3.7",
     "socket.io": "^4.7.1"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3"
   }
 }

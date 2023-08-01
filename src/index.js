@@ -16,7 +16,11 @@ import {
 } from "./services/devices.service.js";
 import { Server } from "socket.io";
 import { createServer } from "http";
-dotenv.config();
+if (process.env.NODE_ENV === 'production') {
+  dotenv.config({ path: 'prod.env' });
+} else {
+  dotenv.config({ path: 'dev.env' });
+}
 
 const app = express();
 app.use(express.json());
