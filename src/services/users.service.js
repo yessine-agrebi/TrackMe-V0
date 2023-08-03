@@ -50,20 +50,43 @@ const createUser = asyncHandler(async (req, res) => {
 });
 
 const updateUser = asyncHandler(async (req, res, next) => {
-    const document = await User.findByIdAndUpdate(req.params.id, req.body, {
-        new: true,
-      });
-  
-      if (!document) {
-        return next(
-          new ApiError(`Pas d'utilisateur avec cet id ${req.params.id}`, 404)
-        );
+  // Check if the password field exists in req.body
+  if (req.body.password) {
+    // Check if the password is already hashed
+    const user = await User.findById(req.params.id);
+    if (user && user.password) {
+      const isHashed = await bcrypt.compare(req.body.password, user.password);
+      if (!isHashed) {
+        // Generate a salt for hashing the password
+        const saltRounds = 10;
+        try {
+          // Hash the password using bcrypt
+          const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
+          // Replace the original password in req.body with the hashed password
+          req.body.password = hashedPassword;
+        } catch (error) {
+          // Handle hashing error if needed
+          return next(new ApiError('Error hashing password', 500));
+        }
       }
-      // post middleware to update the average rating and quantity of reviews
-      // MongoDB Trigger "save" to update the average rating and quantity of reviews
-      document.save();
-      res.status(200).json({ data: document });
-})
+    }
+  }
+
+  // Continue with the update logic
+  const document = await User.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+  });
+
+  if (!document) {
+    return next(new ApiError(`Pas d'utilisateur avec cet id ${req.params.id}`, 404));
+  }
+
+  // post middleware to update the average rating and quantity of reviews
+  // MongoDB Trigger "save" to update the average rating and quantity of reviews
+  document.save();
+  res.status(200).json({ data: document });
+});
+
 
 const deleteUser = asyncHandler(async (req, res, next) => {
         const user = await  User.findByIdAndDelete(req.params.id)
