@@ -143,7 +143,7 @@ export async function fetchRealTimePosition(deviceId) {
     const device = response.data.result;
     const filteredData = device.map(({ telemetry: { position: { value } } }) => value);
     if (filteredData.length > 0) {
-      return { latitude: filteredData[0].latitude, longitude: filteredData[0].longitude };
+      return { latitude: filteredData[0].latitude, longitude: filteredData[0].longitude, id: device[0].id };
     }
   } catch (error) {
     console.error("Error while fetching real-time position:", error);
