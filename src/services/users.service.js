@@ -14,7 +14,7 @@ const getAllUsers = asyncHandler(async (req, res) => {
 const getOneUser = asyncHandler(async (req, res, next) => {
   console.log("params: ", req.params.id);
   try {
-    const user = await User.findById(req.params.id);
+    const user = await User.findById(req.params.id).populate({ path: "cars" });
     res.status(200).json(user);
     next();
   } catch (error) {

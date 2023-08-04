@@ -13,7 +13,7 @@ const login = asyncHandler(async (req, res, next) => {
   if (!password) {
     return next(new ApiError("mot de passe est obligatoire", 400));
   }
-  const user = await User.findOne({ email: req.body.email });
+  const user = await User.findOne({ email: req.body.email }).populate({ path: "cars" });
   if (!user || !(await bcrypt.compare(req.body.password, user.password))) {
     return next(new ApiError("email ou mot de passe incorrect", 401));
   }
