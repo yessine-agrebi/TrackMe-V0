@@ -16,10 +16,10 @@ import {
 } from "./services/devices.service.js";
 import { Server } from "socket.io";
 import { createServer } from "http";
-if (process.env.NODE_ENV === 'production') {
-  dotenv.config({ path: 'prod.env' });
+if (process.env.NODE_ENV === "production") {
+  dotenv.config({ path: "prod.env" });
 } else {
-  dotenv.config({ path: 'dev.env' });
+  dotenv.config({ path: "dev.env" });
 }
 
 const app = express();
@@ -78,9 +78,9 @@ export const emitEvent = (eventName, data) => {
 };
 
 setSocket(io);
-app.get('/', (req, res) => {
-  res.send('Welcome to track me api service')
-})
+app.get("/", (req, res) => {
+  res.send("Welcome to track me api service");
+});
 //Routes
 app.use("/api/v0/auth", authRouter);
 app.use("/api/v0/users", usersRouter);
@@ -88,7 +88,7 @@ app.use("/api/v0/devices", devicesRouter);
 app.use("/api/v0/history", historyRouter);
 app.use("/api/v0/cars", carsRouter);
 
-server.listen(process.env.APP_PORT, () => {
-  console.log(`Server running on port ${process.env.APP_PORT}`);
-  console.log(`worker pid = ${process.pid}`);
+server.listen(0, () => {
+  const allocatedPort = server.address().port;
+  console.log(`Server is running on port ${allocatedPort}`);
 });
