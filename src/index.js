@@ -88,7 +88,6 @@ app.use("/api/v0/devices", devicesRouter);
 app.use("/api/v0/history", historyRouter);
 app.use("/api/v0/cars", carsRouter);
 
-server.listen(0, () => {
-  const allocatedPort = server.address().port;
-  console.log(`Server is running on port ${allocatedPort}`);
+server.listen(process.env.APP_PORT, () => {
+  console.log(`Server is running on port ${process.env.APP_PORT}`);
 });
