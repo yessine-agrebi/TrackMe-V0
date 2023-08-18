@@ -22,8 +22,8 @@ const getHistory = asyncHandler(async (req, res, next) => {
   try {
     const response = await axios.get(
       `${process.env.ENDPOINT}/gw/devices/${req.params.id}/messages?data={
-        "filter":"position.longitude,position.latitude,position.timestamp",
-        "fields":"position.longitude,position.latitude,device.name,device.id,position.speed,position.timestamp"
+        "filter":"position.longitude,position.latitude",
+        "fields":"position.longitude,position.latitude,device.name,device.id,position.speed,timestamp"
            }`,
       {
         headers,
@@ -61,7 +61,7 @@ const getHistory = asyncHandler(async (req, res, next) => {
           name: historyData[0]["device.name"],
         },
         positions: historyData.map((position) => {
-          const timestamp = position["position.timestamp"];
+          const timestamp = position["timestamp"];
           const date = new Date(timestamp * 1000);
           const formattedDate = format(date, 'dd/MM/yyyy');
           const formattedTime = format(date, 'HH:mm:ss');
