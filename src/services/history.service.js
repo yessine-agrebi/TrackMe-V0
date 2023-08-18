@@ -1,7 +1,15 @@
 import axios from "axios";
 import asyncHandler from "express-async-handler";
 import History from "../model/historyModel.js";
-import { addDays, endOfDay, format, fromUnixTime, parse, parseISO, startOfDay } from "date-fns";
+import {
+  addDays,
+  endOfDay,
+  format,
+  fromUnixTime,
+  parse,
+  parseISO,
+  startOfDay,
+} from "date-fns";
 
 function formatDate(timestamp) {
   const dateRegex = /^(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2}):(\d{2})$/;
@@ -22,32 +30,31 @@ const getHistory = asyncHandler(async (req, res, next) => {
   try {
     const response = await axios.get(
       `${process.env.ENDPOINT}/gw/devices/${req.params.id}/messages?data={
-        "filter":"position.longitude,position.latitude,position.timestamp",
-        "fields":"position.longitude,position.latitude,device.name,device.id,position.speed,position.timestamp"
+        "filter":"position.longitude,position.latitude,channel.id,device.name,device.id","fields":"position.longitude,position.latitude,channel.id,device.name,device.id,timestamp"
            }`,
       {
         headers,
       }
     );
     const historyData = response.data.result;
+    console.log(historyData);
     const deviceId = historyData[0]["device.id"];
 
     // Find the existing document with the same device ID
     const existingHistory = await History.findOne({ "device.id": deviceId });
-
     if (existingHistory) {
       // If the document exists, update its positions
       existingHistory.positions = historyData.map((position) => {
-        const timestamp = position["position.timestamp"];
+        const timestamp = position["timestamp"];
         const date = new Date(timestamp * 1000);
-        const formattedDate = format(date, 'dd/MM/yyyy');
-        const formattedTime = format(date, 'HH:mm:ss');
+        const formattedDate = format(date, "dd/MM/yyyy");
+        const formattedTime = format(date, "HH:mm:ss");
         return {
           latitude: position["position.latitude"],
           longitude: position["position.longitude"],
           speed: position["position.speed"],
           date: formattedDate,
-          time: formattedTime
+          time: formattedTime,
         };
       });
 
@@ -63,14 +70,14 @@ const getHistory = asyncHandler(async (req, res, next) => {
         positions: historyData.map((position) => {
           const timestamp = position["position.timestamp"];
           const date = new Date(timestamp * 1000);
-          const formattedDate = format(date, 'dd/MM/yyyy');
-          const formattedTime = format(date, 'HH:mm:ss');
+          const formattedDate = format(date, "dd/MM/yyyy");
+          const formattedTime = format(date, "HH:mm:ss");
           return {
             latitude: position["position.latitude"],
             longitude: position["position.longitude"],
             speed: position["position.speed"],
             date: formattedDate,
-            time: formattedTime
+            time: formattedTime,
           };
         }),
       });
@@ -83,7 +90,6 @@ const getHistory = asyncHandler(async (req, res, next) => {
     res.status(500).json({ message: "Server error" });
   }
 });
-
 
 const getLocationsByDate = async (req, res) => {
   const { deviceId, start, end } = req.params;
@@ -105,11 +111,7 @@ const getLocationsByDate = async (req, res) => {
     const locations = locationDocument.positions;
     // Filter the locations based on the date range
     const filteredLocations = locations.filter((location) => {
-      const locationDate = parse(
-        location.date,
-        "dd/MM/yyyy",
-        new Date()
-      );
+      const locationDate = parse(location.date, "dd/MM/yyyy", new Date());
       return (
         (endDate && locationDate >= startDate && locationDate <= endDate) ||
         (!endDate &&
