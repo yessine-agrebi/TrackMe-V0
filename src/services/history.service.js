@@ -21,29 +21,25 @@ function formatDate(timestamp) {
   const [, day, month, year, hour, minute, second] = match;
   return `${year}-${month}-${day}T${hour}:${minute}:${second}.000Z`;
 }
-const getHistory = asyncHandler(async (req, res, next) => {
-  const headers = {
-    "Content-Type": "application/json",
-    Authorization: `FlespiToken ${process.env.FLESPITOKEN}`,
-  };
 
+const updateHistoryData = async (deviceId) => {
   try {
     const response = await axios.get(
-      `${process.env.ENDPOINT}/gw/devices/${req.params.id}/messages?data={
+      `${process.env.ENDPOINT}/gw/devices/${deviceId}/messages?data={
         "filter":"position.longitude,position.latitude,channel.id,device.name,device.id","fields":"position.longitude,position.latitude,channel.id,device.name,device.id,timestamp"
-           }`,
+      }`,
       {
-        headers,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `FlespiToken ${process.env.FLESPITOKEN}`,
+        },
       }
     );
-    const historyData = response.data.result;
-    console.log(historyData);
-    const deviceId = historyData[0]["device.id"];
 
-    // Find the existing document with the same device ID
+    const historyData = response.data.result;
     const existingHistory = await History.findOne({ "device.id": deviceId });
+
     if (existingHistory) {
-      // If the document exists, update its positions
       existingHistory.positions = historyData.map((position) => {
         const timestamp = position["timestamp"];
         const date = new Date(timestamp * 1000);
@@ -59,16 +55,15 @@ const getHistory = asyncHandler(async (req, res, next) => {
       });
 
       await existingHistory.save();
-      res.status(200).json(existingHistory);
+      return existingHistory
     } else {
-      // If the document doesn't exist, create a new one
       const history = new History({
         device: {
           id: deviceId,
           name: historyData[0]["device.name"],
         },
         positions: historyData.map((position) => {
-          const timestamp = position["position.timestamp"];
+          const timestamp = position["timestamp"];
           const date = new Date(timestamp * 1000);
           const formattedDate = format(date, "dd/MM/yyyy");
           const formattedTime = format(date, "HH:mm:ss");
@@ -83,12 +78,16 @@ const getHistory = asyncHandler(async (req, res, next) => {
       });
 
       await history.save();
-      res.status(201).json(history);
+      return history
     }
   } catch (error) {
     console.error("Error updating location:", error);
-    res.status(500).json({ message: "Server error" });
   }
+};
+
+const getHistory = asyncHandler(async (req, res, next) => {
+  const deviceId = req.params.id;
+  updateHistoryData(deviceId).then((response) => res.json(response)).catch((error) => console.error(error.message))
 });
 
 const getLocationsByDate = async (req, res) => {
@@ -101,6 +100,8 @@ const getLocationsByDate = async (req, res) => {
     let query = {
       "device.id": deviceId,
     };
+
+    await updateHistoryData(deviceId)
 
     const locationDocument = await History.findOne(query);
 
