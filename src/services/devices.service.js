@@ -6,7 +6,7 @@ import User from "../model/usersModel.js";
 import Device from "../model/deviceModel.js";
 import { emitEvent } from "../index.js";
 
-// users.service.js
+
 
 let socket;
 
