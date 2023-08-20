@@ -4,7 +4,6 @@ import _ from "lodash";
 import ApiError from "../utils/apiError.js";
 import User from "../model/usersModel.js";
 import Device from "../model/deviceModel.js";
-import { emitEvent } from "../index.js";
 
 
 
