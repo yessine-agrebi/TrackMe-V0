@@ -25,7 +25,7 @@ function formatDate(timestamp) {
 const updateHistoryData = async (deviceId) => {
   try {
     const response = await axios.get(
-      `${process.env.ENDPOINT}/gw/devices/${req.params.id}/messages?data={
+      `${process.env.ENDPOINT}/gw/devices/${deviceId}/messages?data={
         "filter":"position.longitude,position.latitude",
         "fields":"position.longitude,position.latitude,device.name,device.id,position.speed,timestamp"
            }`,
